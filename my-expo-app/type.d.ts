@@ -1,4 +1,4 @@
-import type { ImageSourcePropType } from 'react-native';
+import type { ImageSourcePropType } from "react-native";
 
 declare global {
   interface AppTab {
@@ -24,11 +24,12 @@ declare global {
     price: number;
     currency?: string;
     billing: string;
+    frequency?: string;
     renewalDate?: string;
     color?: string;
   }
 
-  interface SubscriptionCardProps extends Omit<Subscription, 'id'> {
+  interface SubscriptionCardProps extends Omit<Subscription, "id"> {
     expanded: boolean;
     onPress: () => void;
     onCancelPress?: () => void;
@@ -44,7 +45,8 @@ declare global {
     daysLeft: number;
   }
 
-  interface UpcomingSubscriptionCardProps extends Omit<UpcomingSubscription, 'id'> {}
+  interface UpcomingSubscriptionCardProps
+      extends Omit<UpcomingSubscription, "id"> {}
 
   interface ListHeadingProps {
     title: string;

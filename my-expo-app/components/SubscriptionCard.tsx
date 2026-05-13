@@ -1,86 +1,75 @@
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import React from 'react';
 import { formatCurrency, formatStatusLabel, formatSubscriptionDateTime } from '@/lib/utils';
-import clsx from 'clsx';
+import { colors } from '@/constants/theme';
 
 const SubscriptionCard = ({
-                              name, price, currency, icon, billing, color, category,
+                              name, price, currency, billing, color, category,
                               plan, renewalDate, expanded, onPress, paymentMethod,
                               startDate, status, id, onCancel,
                           }: SubscriptionCardProps) => {
     return (
-        <Pressable
-            onPress={onPress}
-            className={clsx('sub-card', expanded ? 'sub-card-expanded' : 'bg-card')}
-            style={!expanded && color ? { backgroundColor: color } : undefined}>
+        <Pressable onPress={onPress} style={styles.card}>
 
-            <View className="sub-head">
-                <View className="sub-main">
-                    {typeof icon === 'number' ? (
-                        <Image source={icon} className="sub-icon" />
-                    ) : (
-                        <Text className="sub-icon">{icon}</Text>
-                    )}
-                    <View className="sub-copy">
-                        <Text numberOfLines={1} className="sub-title">{name}</Text>
-                        <Text numberOfLines={1} ellipsizeMode="tail" className="sub-meta">
+            {/* Main row */}
+            <View style={styles.row}>
+                <View style={styles.left}>
+                    {/* Colored initial circle */}
+                    <View style={[styles.initial, { backgroundColor: color ?? '#d4d4d4' }]}>
+                        <Text style={styles.initialText}>
+                            {name?.charAt(0)?.toUpperCase() ?? '?'}
+                        </Text>
+                    </View>
+                    <View style={styles.info}>
+                        <Text style={styles.name} numberOfLines={1}>{name}</Text>
+                        <Text style={styles.meta} numberOfLines={1}>
                             {category?.trim() || plan?.trim() || (renewalDate ? formatSubscriptionDateTime(renewalDate) : '')}
                         </Text>
                     </View>
                 </View>
 
-                <View className="sub-price-box">
-                    <Text className="sub-price">{formatCurrency(price, currency)}</Text>
-                    <Text className="sub-billing">{billing}</Text>
+                <View style={styles.right}>
+                    <Text style={styles.price}>{formatCurrency(price, currency)}</Text>
+                    <Text style={styles.billing}>{billing}</Text>
                 </View>
             </View>
 
+            {/* Expanded details */}
             {expanded && (
-                <View className="sub-bdy">
-                    <View className="sub-details">
-                        <View className="sub-row">
-                            <View className="sub-row-copy">
-                                <Text className="sub-label">Payment:</Text>
-                                <Text className="sub-value" numberOfLines={1} ellipsizeMode="tail">
-                                    {paymentMethod?.trim() ?? 'Not provided'}
-                                </Text>
-                            </View>
-                        </View>
-                        <View className="sub-row">
-                            <View className="sub-row-copy">
-                                <Text className="sub-label">Category:</Text>
-                                <Text className="sub-value" numberOfLines={1} ellipsizeMode="tail">
-                                    {(category?.trim() || plan?.trim()) ?? 'Not provided'}
-                                </Text>
-                            </View>
-                        </View>
-                        <View className="sub-row">
-                            <View className="sub-row-copy">
-                                <Text className="sub-label">Started:</Text>
-                                <Text className="sub-value" numberOfLines={1} ellipsizeMode="tail">
-                                    {startDate ? formatSubscriptionDateTime(startDate) : 'Not provided'}
-                                </Text>
-                            </View>
-                        </View>
-                        <View className="sub-row">
-                            <View className="sub-row-copy">
-                                <Text className="sub-label">Renewal date:</Text>
-                                <Text className="sub-value" numberOfLines={1} ellipsizeMode="tail">
-                                    {renewalDate ? formatSubscriptionDateTime(renewalDate) : 'Not provided'}
-                                </Text>
-                            </View>
-                        </View>
-                        <View className="sub-row">
-                            <View className="sub-row-copy">
-                                <Text className="sub-label">Status:</Text>
-                                <Text className="sub-value" numberOfLines={1} ellipsizeMode="tail">
-                                    {status ? formatStatusLabel(status) : 'Not provided'}
-                                </Text>
-                            </View>
-                        </View>
+                <View style={styles.expanded}>
+                    <View style={styles.divider} />
+
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Payment</Text>
+                        <Text style={styles.detailValue} numberOfLines={1}>
+                            {paymentMethod?.trim() ?? 'Not provided'}
+                        </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Category</Text>
+                        <Text style={styles.detailValue} numberOfLines={1}>
+                            {(category?.trim() || plan?.trim()) ?? 'Not provided'}
+                        </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Started</Text>
+                        <Text style={styles.detailValue} numberOfLines={1}>
+                            {startDate ? formatSubscriptionDateTime(startDate) : 'Not provided'}
+                        </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Renewal</Text>
+                        <Text style={styles.detailValue} numberOfLines={1}>
+                            {renewalDate ? formatSubscriptionDateTime(renewalDate) : 'Not provided'}
+                        </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Status</Text>
+                        <Text style={styles.detailValue} numberOfLines={1}>
+                            {status ? formatStatusLabel(status) : 'Not provided'}
+                        </Text>
                     </View>
 
-                    {/* ✅ Remove button — same style as CreditCardDueCard ✕ */}
                     {onCancel && (
                         <Pressable
                             style={styles.removeBtn}
@@ -96,8 +85,86 @@ const SubscriptionCard = ({
 };
 
 const styles = StyleSheet.create({
+    card: {
+        backgroundColor: colors.card, // ✅ white card — no colored background
+        borderRadius: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    left: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        flex: 1,
+    },
+    initial: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    initialText: {
+        fontSize: 20,
+        fontFamily: 'sans-bold',
+        color: '#000000', // ✅ black letter
+    },
+    info: { flex: 1 },
+    name: {
+        fontSize: 15,
+        fontFamily: 'sans-bold',
+        color: colors.primary,
+    },
+    meta: {
+        fontSize: 12,
+        fontFamily: 'sans-medium',
+        color: colors.mutedForeground,
+        marginTop: 2,
+    },
+    right: { alignItems: 'flex-end', marginLeft: 12 },
+    price: {
+        fontSize: 16,
+        fontFamily: 'sans-bold',
+        color: colors.primary,
+    },
+    billing: {
+        fontSize: 12,
+        fontFamily: 'sans-medium',
+        color: colors.mutedForeground,
+        marginTop: 2,
+    },
+    expanded: { marginTop: 12 },
+    divider: {
+        height: 1,
+        backgroundColor: colors.border,
+        marginBottom: 12,
+    },
+    detailRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 5,
+    },
+    detailLabel: {
+        fontSize: 13,
+        fontFamily: 'sans-medium',
+        color: colors.mutedForeground,
+    },
+    detailValue: {
+        fontSize: 13,
+        fontFamily: 'sans-semibold',
+        color: colors.primary,
+        maxWidth: '60%',
+        textAlign: 'right',
+    },
     removeBtn: {
-        marginTop: 16,
+        marginTop: 12,
         paddingVertical: 12,
         borderRadius: 12,
         alignItems: 'center',

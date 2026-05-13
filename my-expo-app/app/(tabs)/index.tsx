@@ -1,5 +1,5 @@
 import '@/global.css';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Text, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatCurrency } from '@/lib/utils';
 import { colors } from '@/constants/theme';
@@ -10,21 +10,21 @@ import SubscriptionCard from '@/components/SubscriptionCard';
 import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
 import AddCreditCardModal, { CreditCard } from '@/components/AddCreditCardModal';
 import CreditCardDueCard from '@/components/CreditCardDueCard';
+import UploadStatementModal from '@/components/UploadStatementModal'; // ✅ new
 import { useMemo, useState } from 'react';
 import { useUser } from '@clerk/expo';
 import { useUserStore } from '@/lib/userStore';
-import { useSubscriptionStore } from '@/lib/subscriptionStore'; // ✅ use store
+import { useSubscriptionStore } from '@/lib/subscriptionStore';
 
 export default function App() {
     const { user } = useUser();
     const { appUser } = useUserStore();
-
-    // ✅ subscriptions from store — shared with subscriptions tab
     const { subscriptions, addSubscription, removeSubscription } = useSubscriptionStore();
 
     const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isCardModalVisible, setIsCardModalVisible] = useState(false);
+    const [isUploadModalVisible, setIsUploadModalVisible] = useState(false); // ✅ new
     const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
 
     const displayName = useMemo(() => {
@@ -45,12 +45,12 @@ export default function App() {
     };
 
     const handleRemoveSubscription = (id: string) => {
-        removeSubscription(id); // ✅ updates store
+        removeSubscription(id);
         setExpandedSubscriptionId(null);
     };
 
     const handleCreateSubscription = (newSubscription: Subscription) => {
-        addSubscription(newSubscription); // ✅ updates store
+        addSubscription(newSubscription);
     };
 
     const handleAddCard = (card: CreditCard) => setCreditCards((c) => [card, ...c]);
@@ -61,10 +61,31 @@ export default function App() {
             <FlatList
                 ListHeaderComponent={() => (
                     <>
-                        <View className="home-header" style={{ paddingHorizontal: 20 }}>
+                        {/* Header with upload button */}
+                        <View style={{
+                            flexDirection: 'row', alignItems: 'center',
+                            justifyContent: 'space-between',
+                            paddingHorizontal: 20,
+                        }}>
                             <Text className="home-user-name">Welcome, {displayName}</Text>
+
+                            {/* ✅ Upload button */}
+                            <Pressable
+                                onPress={() => setIsUploadModalVisible(true)}
+                                style={{
+                                    flexDirection: 'row', alignItems: 'center', gap: 6,
+                                    backgroundColor: colors.card,
+                                    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8,
+                                    borderWidth: 1, borderColor: colors.border,
+                                }}>
+                                <Text style={{ fontSize: 16 }}>📎</Text>
+                                <Text style={{ fontSize: 13, fontFamily: 'sans-semibold', color: colors.primary }}>
+                                    Scan
+                                </Text>
+                            </Pressable>
                         </View>
 
+                        {/* Balance card */}
                         <View style={{ paddingHorizontal: 20 }}>
                             <View className="home-balance-card">
                                 <Text className="home-balance-label">Balance</Text>
@@ -163,6 +184,12 @@ export default function App() {
                 visible={isCardModalVisible}
                 onClose={() => setIsCardModalVisible(false)}
                 onAdd={handleAddCard}
+            />
+
+            {/* ✅ Upload modal */}
+            <UploadStatementModal
+                visible={isUploadModalVisible}
+                onClose={() => setIsUploadModalVisible(false)}
             />
         </SafeAreaView>
     );

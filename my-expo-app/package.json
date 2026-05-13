@@ -19,8 +19,11 @@
     "expo": "^54.0.0",
     "expo-auth-session": "~7.0.11",
     "expo-constants": "~18.0.13",
+    "expo-document-picker": "~14.0.8",
+    "expo-file-system": "~19.0.22",
     "expo-font": "~14.0.11",
     "expo-image": "~3.0.11",
+    "expo-image-picker": "~17.0.11",
     "expo-linking": "~8.0.12",
     "expo-mail-composer": "~15.0.8",
     "expo-notifications": "~0.32.17",
@@ -30,9 +33,10 @@
     "expo-status-bar": "~3.0.8",
     "expo-web-browser": "~15.0.11",
     "nativewind": "preview",
+    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8.5.6",
     "react": "19.1.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-css": "latest",
     "react-native-reanimated": "~4.1.1",
@@ -55,7 +59,9 @@
   },
   "main": "expo-router/entry",
   "overrides": {
-    "lightningcss": "1.30.1"
+    "lightningcss": "1.30.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "private": true
 }

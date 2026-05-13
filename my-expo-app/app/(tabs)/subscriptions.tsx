@@ -7,18 +7,12 @@ import { icons } from '@/constants/icons';
 import { colors } from '@/constants/theme';
 import { formatCurrency } from '@/lib/utils';
 import SubscriptionCard from '@/components/SubscriptionCard';
-import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
 import { useSubscriptionStore } from '@/lib/subscriptionStore';
-import { useUserStore } from '@/lib/userStore';
 
 export default function SubscriptionsScreen() {
   const router = useRouter();
-  const { appUser } = useUserStore();
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  // ✅ same store as index.tsx — always in sync
-  const { subscriptions, addSubscription, cancelSubscription } = useSubscriptionStore();
+  const { subscriptions, cancelSubscription } = useSubscriptionStore();
 
   const handlePress = (item: Subscription) => {
     setExpandedId((current) => (current === item.id ? null : item.id));
@@ -27,10 +21,6 @@ export default function SubscriptionsScreen() {
   const handleCancel = (id: string) => {
     cancelSubscription(id);
     setExpandedId(null);
-  };
-
-  const handleCreate = (newSubscription: Subscription) => {
-    addSubscription(newSubscription);
   };
 
   const activeCount = subscriptions.filter((s) => s.status === 'active').length;
@@ -50,13 +40,8 @@ export default function SubscriptionsScreen() {
             <Image source={icons.back} style={styles.headerIcon} resizeMode="contain" />
           </Pressable>
           <Text style={styles.headerTitle}>My Subscriptions</Text>
-          {/* ✅ + Add button in header */}
-          <Pressable
-              onPress={() => setIsModalVisible(true)}
-              hitSlop={12}
-              style={styles.addBtn}>
-            <Text style={styles.addBtnText}>+ Add</Text>
-          </Pressable>
+          {/* ✅ empty view to keep title centered */}
+          <View style={{ width: 28 }} />
         </View>
 
         {/* Summary bar */}
@@ -96,19 +81,11 @@ export default function SubscriptionsScreen() {
             ListEmptyComponent={
               <View style={styles.emptyWrap}>
                 <Text style={styles.emptyText}>No subscriptions yet.</Text>
-                <Pressable style={styles.emptyBtn} onPress={() => setIsModalVisible(true)}>
-                  <Text style={styles.emptyBtnText}>+ Add your first subscription</Text>
-                </Pressable>
+                <Text style={styles.emptySubText}>
+                  Go to Home and tap "+ Add" to add your first subscription.
+                </Text>
               </View>
             }
-        />
-
-        <CreateSubscriptionModal
-            visible={isModalVisible}
-            onClose={() => setIsModalVisible(false)}
-            onSubmit={handleCreate}
-            appUserId={appUser?.id}
-            userRegion={appUser?.region}
         />
 
       </SafeAreaView>
@@ -128,18 +105,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontFamily: 'sans-bold',
-    color: colors.primary,
-  },
-  addBtn: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  addBtnText: {
-    fontSize: 13,
-    fontFamily: 'sans-semibold',
     color: colors.primary,
   },
   summaryBar: {
@@ -164,22 +129,18 @@ const styles = StyleSheet.create({
   },
   summaryDivider: { width: 1, height: 32, backgroundColor: colors.border },
   listContent: { paddingHorizontal: 20, paddingBottom: 120 },
-  emptyWrap: { alignItems: 'center', marginTop: 60, gap: 16 },
+  emptyWrap: { alignItems: 'center', marginTop: 60, gap: 12 },
   emptyText: {
+    textAlign: 'center',
+    color: colors.primary,
+    fontFamily: 'sans-bold',
+    fontSize: 16,
+  },
+  emptySubText: {
     textAlign: 'center',
     color: colors.mutedForeground,
     fontFamily: 'sans-medium',
     fontSize: 14,
-  },
-  emptyBtn: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  emptyBtnText: {
-    color: '#fff',
-    fontFamily: 'sans-semibold',
-    fontSize: 14,
+    paddingHorizontal: 40,
   },
 });

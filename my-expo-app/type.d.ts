@@ -1,4 +1,3 @@
-// type.d.ts
 import { ImageSourcePropType } from 'react-native';
 
 declare global {
@@ -10,7 +9,7 @@ declare global {
 
   interface Subscription {
     id: string;
-    icon: ImageSourcePropType | string;
+    icon?: ImageSourcePropType | string; // ✅ optional
     name: string;
     price: number;
     currency: string;
@@ -44,7 +43,6 @@ declare global {
     icon: ImageSourcePropType;
   }
 
-  // ✅ Fix error 3 — SubscriptionCard needs this globally
   interface SubscriptionCardProps extends Subscription {
     expanded?: boolean;
     onPress?: () => void;

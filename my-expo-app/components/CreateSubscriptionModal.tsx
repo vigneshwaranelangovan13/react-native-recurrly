@@ -4,7 +4,6 @@ import {
 } from 'react-native';
 import { useState } from 'react';
 import { colors } from '@/constants/theme';
-import { icons } from '@/constants/icons';
 import { useCurrencyStore } from '@/lib/currencyStore';
 import dayjs from 'dayjs';
 
@@ -70,14 +69,14 @@ export default function CreateSubscriptionModal({
       id: `sub-${Date.now()}`,
       name: name.trim(),
       price: priceValue,
-      currency: currencyCode, // ✅ uses selected currency
+      currency: currencyCode,
       category,
       status: 'active',
       startDate: now.toISOString(),
       renewalDate: renewalDate.toISOString(),
-      icon: icons.plus,
       billing: frequency,
       color: CATEGORY_COLORS[category],
+      // ✅ no icon
     };
 
     onSubmit(newSubscription);
@@ -105,7 +104,6 @@ export default function CreateSubscriptionModal({
           <Pressable style={styles.overlay} onPress={handleClose}>
             <Pressable style={styles.container} onPress={(e) => e.stopPropagation()}>
 
-              {/* Header */}
               <View style={styles.header}>
                 <Text style={styles.title}>New Subscription</Text>
                 <Pressable style={styles.closeBtn} onPress={handleClose}>
@@ -118,7 +116,6 @@ export default function CreateSubscriptionModal({
                   keyboardShouldPersistTaps="handled"
                   contentContainerStyle={{ gap: 20, padding: 20, paddingBottom: 32 }}>
 
-                {/* Name */}
                 <View style={styles.field}>
                   <Text style={styles.label}>Name</Text>
                   <TextInput
@@ -130,7 +127,6 @@ export default function CreateSubscriptionModal({
                   />
                 </View>
 
-                {/* Price */}
                 <View style={styles.field}>
                   <Text style={styles.label}>Price ({currencyCode})</Text>
                   <TextInput
@@ -143,7 +139,6 @@ export default function CreateSubscriptionModal({
                   />
                 </View>
 
-                {/* Frequency */}
                 <View style={styles.field}>
                   <Text style={styles.label}>Frequency</Text>
                   <View style={styles.pickerRow}>
@@ -160,7 +155,6 @@ export default function CreateSubscriptionModal({
                   </View>
                 </View>
 
-                {/* Category */}
                 <View style={styles.field}>
                   <Text style={styles.label}>Category</Text>
                   <View style={styles.categoryWrap}>
@@ -177,7 +171,6 @@ export default function CreateSubscriptionModal({
                   </View>
                 </View>
 
-                {/* Submit */}
                 <Pressable
                     style={[styles.addButton, !isValid && styles.addButtonDisabled]}
                     onPress={handleSubmit}
@@ -215,32 +208,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  title: {
-    fontSize: 18,
-    fontFamily: 'sans-bold',
-    color: colors.primary,
-  },
+  title: { fontSize: 18, fontFamily: 'sans-bold', color: colors.primary },
   closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 32, height: 32, borderRadius: 16,
     backgroundColor: colors.muted,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center', justifyContent: 'center',
   },
-  closeText: {
-    fontSize: 14,
-    fontFamily: 'sans-bold',
-    color: colors.primary,
-  },
-  field: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: 'sans-semibold',
-    color: colors.primary,
-  },
+  closeText: { fontSize: 14, fontFamily: 'sans-bold', color: colors.primary },
+  field: { gap: 8 },
+  label: { fontSize: 14, fontFamily: 'sans-semibold', color: colors.primary },
   input: {
     backgroundColor: colors.card,
     borderRadius: 12,
@@ -252,68 +228,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  pickerRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
+  pickerRow: { flexDirection: 'row', gap: 12 },
   pickerOption: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    flex: 1, paddingVertical: 12, borderRadius: 12,
+    alignItems: 'center', backgroundColor: colors.card,
+    borderWidth: 1.5, borderColor: colors.border,
   },
   pickerOptionActive: {
     borderColor: colors.accent,
     backgroundColor: 'rgba(234,122,83,0.08)',
   },
-  pickerText: {
-    fontSize: 14,
-    fontFamily: 'sans-semibold',
-    color: colors.mutedForeground,
-  },
-  pickerTextActive: {
-    color: colors.accent,
-  },
-  categoryWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
+  pickerText: { fontSize: 14, fontFamily: 'sans-semibold', color: colors.mutedForeground },
+  pickerTextActive: { color: colors.accent },
+  categoryWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
+    backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.border,
   },
   chipActive: {
     borderColor: colors.accent,
     backgroundColor: 'rgba(234,122,83,0.08)',
   },
-  chipText: {
-    fontSize: 13,
-    fontFamily: 'sans-semibold',
-    color: colors.mutedForeground,
-  },
-  chipTextActive: {
-    color: colors.accent,
-  },
+  chipText: { fontSize: 13, fontFamily: 'sans-semibold', color: colors.mutedForeground },
+  chipTextActive: { color: colors.accent },
   addButton: {
-    backgroundColor: colors.accent,
-    borderRadius: 16,
-    paddingVertical: 18,
-    alignItems: 'center',
+    backgroundColor: colors.accent, borderRadius: 16,
+    paddingVertical: 18, alignItems: 'center',
   },
-  addButtonDisabled: {
-    opacity: 0.45,
-  },
-  addButtonText: {
-    fontSize: 16,
-    fontFamily: 'sans-bold',
-    color: '#fff',
-  },
+  addButtonDisabled: { opacity: 0.45 },
+  addButtonText: { fontSize: 16, fontFamily: 'sans-bold', color: '#fff' },
 });

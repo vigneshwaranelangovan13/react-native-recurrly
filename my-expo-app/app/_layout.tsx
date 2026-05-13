@@ -1,12 +1,13 @@
 // app/_layout.tsx
 import '@/global.css';
 import { ClerkProvider } from '@clerk/expo';
-import { tokenCache } from '@clerk/expo/token-cache'; // ✅ built-in, no manual SecureStore
+import { tokenCache } from '@clerk/expo/token-cache';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useCurrencyStore } from '@/lib/currencyStore';
+import { useSubscriptionStore } from '@/lib/subscriptionStore'; // ✅ added
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +28,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     useCurrencyStore.getState().loadCurrency();
+    useSubscriptionStore.getState().loadSubscriptions(); // ✅ added
   }, []);
 
   useEffect(() => {

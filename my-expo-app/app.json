@@ -12,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -41,7 +43,11 @@
             "./assets/fonts/PlusJakartaSans-Light.ttf"
           ]
         }
-      ]
+      ],
+      "@clerk/expo",
+      "expo-secure-store",
+      "expo-mail-composer",
+      "expo-web-browser"
     ],
     "experiments": {
       "tsconfigPaths": true

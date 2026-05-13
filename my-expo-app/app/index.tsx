@@ -1,18 +1,16 @@
-// app/(auth)/_layout.tsx
+// app/index.tsx
+import { Redirect } from 'expo-router';
 import { useAuth } from '@clerk/expo';
-import { Redirect, Stack } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
-import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-export default function AuthLayout() {
-  const { isSignedIn, isLoaded } = useAuth();
+export default function Index() {
+  const { isLoaded, isSignedIn } = useAuth();
   const [hasOnboarded, setHasOnboarded] = useState<boolean | null>(null);
 
   useEffect(() => {
-    SecureStore.getItemAsync('hasOnboarded').then((value) => {
-      setHasOnboarded(value === 'true');
-    });
+    SecureStore.getItemAsync('hasOnboarded').then((v) => setHasOnboarded(v === 'true'));
   }, []);
 
   if (!isLoaded || hasOnboarded === null) {
@@ -31,6 +29,5 @@ export default function AuthLayout() {
 
   if (!hasOnboarded) return <Redirect href="/onboarding" />;
   if (isSignedIn) return <Redirect href="/(tabs)" />;
-
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return <Redirect href="/(auth)/sign-in" />;
 }

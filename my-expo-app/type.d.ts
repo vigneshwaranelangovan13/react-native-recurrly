@@ -1,4 +1,5 @@
-import type { ImageSourcePropType } from "react-native";
+// type.d.ts
+import { ImageSourcePropType } from 'react-native';
 
 declare global {
   interface AppTab {
@@ -7,33 +8,20 @@ declare global {
     icon: ImageSourcePropType;
   }
 
-  interface TabIconProps {
-    focused: boolean;
-    icon: ImageSourcePropType;
-  }
-
   interface Subscription {
     id: string;
-    icon: ImageSourcePropType;
+    icon: ImageSourcePropType | string;
     name: string;
-    plan?: string;
-    category?: string;
-    paymentMethod?: string;
-    status?: string;
-    startDate?: string;
     price: number;
-    currency?: string;
+    currency: string;
     billing: string;
-    frequency?: string;
+    category?: string;
+    plan?: string;
+    paymentMethod?: string;
+    status: 'active' | 'paused' | 'cancelled';
+    startDate: string;
     renewalDate?: string;
     color?: string;
-  }
-
-  interface SubscriptionCardProps extends Omit<Subscription, "id"> {
-    expanded: boolean;
-    onPress: () => void;
-    onCancelPress?: () => void;
-    isCancelling?: boolean;
   }
 
   interface UpcomingSubscription {
@@ -41,15 +29,64 @@ declare global {
     icon: ImageSourcePropType;
     name: string;
     price: number;
-    currency?: string;
+    currency: string;
     daysLeft: number;
   }
 
-  interface UpcomingSubscriptionCardProps
-      extends Omit<UpcomingSubscription, "id"> {}
-
   interface ListHeadingProps {
     title: string;
+    actionLabel?: string;
+    onAction?: () => void;
+  }
+
+  interface TabIconProps {
+    focused: boolean;
+    icon: ImageSourcePropType;
+  }
+
+  // ✅ Fix error 3 — SubscriptionCard needs this globally
+  interface SubscriptionCardProps extends Subscription {
+    expanded?: boolean;
+    onPress?: () => void;
+    onCancel?: (id: string) => void;
+  }
+
+  interface SupabaseGroup {
+    id: string;
+    unique_code: string;
+    owner_id: string;
+    subscription_name: string;
+    emoji: string;
+    max_members: number;
+    current_members: number;
+    region: string;
+    description: string;
+    card_color: string;
+    status: 'open' | 'full' | 'closed';
+    created_at: string;
+    owner?: {
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+      region: string;
+    };
+  }
+
+  interface SupabaseMember {
+    id: string;
+    group_id: string;
+    user_id: string;
+    status: 'pending' | 'approved' | 'rejected';
+    requested_at: string;
+    responded_at?: string;
+    user?: {
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+      region: string;
+    };
   }
 }
 

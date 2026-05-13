@@ -1,27 +1,43 @@
-import { SplashScreen, Stack } from "expo-router";
-import "@/global.css";
-import { useFonts } from "expo-font";
-import { useEffect } from "react";
+// app/_layout.tsx
+import '@/global.css';
+import { ClerkProvider } from '@clerk/expo';
+import { tokenCache } from '@clerk/expo/token-cache'; // ✅ built-in, no manual SecureStore
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { useCurrencyStore } from '@/lib/currencyStore';
 
 SplashScreen.preventAutoHideAsync();
 
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+if (!publishableKey) {
+  throw new Error('Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env file');
+}
+
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    "sans-regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "sans-bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
-    "sans-medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "sans-semibold": require("../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
-    "sans-extrabold": require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
-    "sans-light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
+  const [fontsLoaded, fontError] = useFonts({
+    'sans-regular': require('../assets/fonts/PlusJakartaSans-Regular.ttf'),
+    'sans-bold': require('../assets/fonts/PlusJakartaSans-Bold.ttf'),
+    'sans-medium': require('../assets/fonts/PlusJakartaSans-Medium.ttf'),
+    'sans-semibold': require('../assets/fonts/PlusJakartaSans-SemiBold.ttf'),
+    'sans-extrabold': require('../assets/fonts/PlusJakartaSans-ExtraBold.ttf'),
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
+    useCurrencyStore.getState().loadCurrency();
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) return null;
-
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        {fontsLoaded || fontError ? <Stack screenOptions={{ headerShown: false }} /> : null}
+      </ClerkProvider>
+  );
 }

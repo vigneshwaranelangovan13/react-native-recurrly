@@ -1,3 +1,4 @@
+
 import {View, Text, Image, Pressable} from 'react-native'
 import React from 'react'
 import {formatCurrency, formatStatusLabel, formatSubscriptionDateTime} from "@/lib/utils";
@@ -8,7 +9,11 @@ const SubscriptionCard = ({ name, price, currency, icon, billing, color, categor
         <Pressable onPress={onPress} className={clsx('sub-card', expanded ? 'sub-card-expanded' : 'bg-card')} style={!expanded && color ? { backgroundColor: color } : undefined}>
             <View className="sub-head">
                 <View className="sub-main">
-                    <Image source={icon} className="sub-icon" />
+                    {typeof icon === 'number' ? (
+                        <Image source={icon} className="sub-icon" />
+                    ) : (
+                        <Text className="sub-icon">{icon}</Text>
+                    )}
                     <View className="sub-copy">
                         <Text numberOfLines={1} className="sub-title">
                             {name}
@@ -65,3 +70,5 @@ const SubscriptionCard = ({ name, price, currency, icon, billing, color, categor
     )
 }
 export default SubscriptionCard
+
+

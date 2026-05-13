@@ -53,7 +53,7 @@ export default function SettingsScreen() {
             onPress: async () => {
               try {
                 await signOut();
-                router.replace('/(auth)/sign-in'); // ✅ goes to sign in after logout
+                router.replace('/(auth)/sign-in');
               } catch (err) {
                 console.error('[SignOut] error:', err);
                 Alert.alert('Error', 'Could not sign out. Please try again.');
@@ -76,7 +76,6 @@ export default function SettingsScreen() {
 
           {/* Profile Card */}
           <View style={styles.profileCard}>
-            {/* Initial circle instead of avatar image */}
             <View style={styles.avatarCircle}>
               <Text style={styles.avatarText}>
                 {user?.firstName?.charAt(0)?.toUpperCase() ??
@@ -95,7 +94,6 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Feedback</Text>
             <View style={styles.feedbackForm}>
-
               <View style={styles.field}>
                 <Text style={styles.label}>Email</Text>
                 <TextInput
@@ -124,6 +122,17 @@ export default function SettingsScreen() {
                 <Text style={styles.sendButtonText}>Send Feedback</Text>
               </Pressable>
             </View>
+          </View>
+
+          {/* ✅ Developer Testing — remove before release */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Developer</Text>
+            <Pressable
+                style={styles.row}
+                onPress={() => router.push('/onboarding')}>
+              <Text style={styles.rowText}>🧪 Test Onboarding Flow</Text>
+              <Text style={styles.chevron}>›</Text>
+            </Pressable>
           </View>
 
           {/* Sign Out */}
@@ -188,6 +197,25 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: 12,
     marginLeft: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.card,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  rowText: {
+    fontSize: 15,
+    fontFamily: 'sans-medium',
+    color: colors.primary,
+  },
+  chevron: {
+    fontSize: 20,
+    color: colors.mutedForeground,
   },
   feedbackForm: {
     backgroundColor: colors.card,

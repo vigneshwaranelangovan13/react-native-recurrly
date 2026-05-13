@@ -18,7 +18,7 @@ export default function Onboarding() {
       <View style={styles.content}>
         <Text style={styles.title}>Recurrly</Text>
         <Text style={styles.subtitle}>Track every subscription.{'\n'}Never overpay again.</Text>
-        <Pressable style={styles.button} onPress={() => router.push('/onboarding-currency')}>
+        <Pressable style={styles.button} onPress={() => router.push('/onboarding-quiz')}>
           <Text style={styles.buttonText}>Get Started</Text>
         </Pressable>
       </View>

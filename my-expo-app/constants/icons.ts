@@ -16,6 +16,7 @@ import plus from '@/assets/icons/plus.png';
 import setting from '@/assets/icons/setting.png';
 import spotify from '@/assets/icons/spotify.png';
 import wallet from '@/assets/icons/wallet.png';
+import groupicon from '@/assets/icons/groupicon.png';
 
 export const icons = {
   home,
@@ -36,6 +37,7 @@ export const icons = {
   github,
   claude,
   canva,
+  groupicon,
 } as const;
 
 export type IconKey = keyof typeof icons;

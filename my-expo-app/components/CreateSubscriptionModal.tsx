@@ -1,16 +1,11 @@
 import {
-  View,
-  Text,
-  Modal,
-  Pressable,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
+  Modal, View, Text, TextInput, Pressable,
+  StyleSheet, KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
-import React, { useState } from 'react';
-import clsx from 'clsx';
+import { useState } from 'react';
+import { colors } from '@/constants/theme';
 import { icons } from '@/constants/icons';
+import { useCurrencyStore } from '@/lib/currencyStore';
 import dayjs from 'dayjs';
 
 interface CreateSubscriptionModalProps {
@@ -24,20 +19,16 @@ interface CreateSubscriptionModalProps {
 type Frequency = 'Monthly' | 'Yearly';
 
 type Category =
-  | 'Entertainment'
-  | 'AI Tools'
-  | 'Developer Tools'
-  | 'Design'
-  | 'Productivity'
-  | 'Other';
+    | 'Entertainment'
+    | 'AI Tools'
+    | 'Developer Tools'
+    | 'Design'
+    | 'Productivity'
+    | 'Other';
 
 const CATEGORIES: Category[] = [
-  'Entertainment',
-  'AI Tools',
-  'Developer Tools',
-  'Design',
-  'Productivity',
-  'Other',
+  'Entertainment', 'AI Tools', 'Developer Tools',
+  'Design', 'Productivity', 'Other',
 ];
 
 const CATEGORY_COLORS: Record<Category, string> = {
@@ -49,47 +40,37 @@ const CATEGORY_COLORS: Record<Category, string> = {
   Other: '#d4d4d4',
 };
 
-const CreateSubscriptionModal = ({
-  visible,
-  onClose,
-  onSubmit,
-  appUserId,
-  userRegion,
-}: CreateSubscriptionModalProps) => {
+export default function CreateSubscriptionModal({
+                                                  visible, onClose, onSubmit, appUserId, userRegion,
+                                                }: CreateSubscriptionModalProps) {
+  const { currencyCode } = useCurrencyStore();
+
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [frequency, setFrequency] = useState<Frequency>('Monthly');
   const [category, setCategory] = useState<Category>('Other');
 
   const isValidPrice = () => {
-    const trimmedPrice = price.trim();
-
-    if (!trimmedPrice) return false;
-
-    if (!/^\s*[+-]?(\d+(\.\d+)?|\.\d+)\s*$/.test(trimmedPrice)) {
-      return false;
-    }
-
-    const numValue = Number(trimmedPrice);
-
-    return Number.isFinite(numValue) && numValue > 0;
+    const trimmed = price.trim();
+    if (!trimmed) return false;
+    if (!/^\s*[+-]?(\d+(\.\d+)?|\.\d+)\s*$/.test(trimmed)) return false;
+    const num = Number(trimmed);
+    return Number.isFinite(num) && num > 0;
   };
 
-  const isValidForm = name.trim() !== '' && isValidPrice();
+  const isValid = name.trim() !== '' && isValidPrice();
 
   const handleSubmit = () => {
-    if (!isValidForm) return;
-
+    if (!isValid) return;
     const priceValue = Number(price.trim());
     const now = dayjs();
-
     const renewalDate = frequency === 'Monthly' ? now.add(1, 'month') : now.add(1, 'year');
 
     const newSubscription: Subscription = {
       id: `sub-${Date.now()}`,
       name: name.trim(),
       price: priceValue,
-      currency: 'USD',
+      currency: currencyCode, // ✅ uses selected currency
       category,
       status: 'active',
       startDate: now.toISOString(),
@@ -117,120 +98,222 @@ const CreateSubscriptionModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-        keyboardVerticalOffset={0}>
-        <Pressable className="modal-overlay" onPress={handleClose}>
-          <Pressable className="modal-container" onPress={(e) => e.stopPropagation()}>
-            <View className="modal-header">
-              <Text className="modal-title">New Subscription</Text>
+      <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}>
+          <Pressable style={styles.overlay} onPress={handleClose}>
+            <Pressable style={styles.container} onPress={(e) => e.stopPropagation()}>
 
-              <Pressable className="modal-close" onPress={handleClose}>
-                <Text className="modal-close-text">✕</Text>
-              </Pressable>
-            </View>
-
-            <ScrollView
-              className="p-5"
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              contentContainerStyle={{ gap: 20, paddingBottom: 20 }}>
-              <View className="auth-field">
-                <Text className="auth-label">Name</Text>
-
-                <TextInput
-                  className="auth-input"
-                  placeholder="Subscription name"
-                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                  value={name}
-                  onChangeText={setName}
-                />
+              {/* Header */}
+              <View style={styles.header}>
+                <Text style={styles.title}>New Subscription</Text>
+                <Pressable style={styles.closeBtn} onPress={handleClose}>
+                  <Text style={styles.closeText}>✕</Text>
+                </Pressable>
               </View>
 
-              <View className="auth-field">
-                <Text className="auth-label">Price</Text>
+              <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                  contentContainerStyle={{ gap: 20, padding: 20, paddingBottom: 32 }}>
 
-                <TextInput
-                  className="auth-input"
-                  placeholder="0.00"
-                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                  value={price}
-                  onChangeText={setPrice}
-                  keyboardType="decimal-pad"
-                />
-              </View>
-
-              <View className="auth-field">
-                <Text className="auth-label">Frequency</Text>
-
-                <View className="picker-row">
-                  <Pressable
-                    className={clsx(
-                      'picker-option',
-                      frequency === 'Monthly' && 'picker-option-active'
-                    )}
-                    onPress={() => setFrequency('Monthly')}>
-                    <Text
-                      className={clsx(
-                        'picker-option-text',
-                        frequency === 'Monthly' && 'picker-option-text-active'
-                      )}>
-                      Monthly
-                    </Text>
-                  </Pressable>
-
-                  <Pressable
-                    className={clsx(
-                      'picker-option',
-                      frequency === 'Yearly' && 'picker-option-active'
-                    )}
-                    onPress={() => setFrequency('Yearly')}>
-                    <Text
-                      className={clsx(
-                        'picker-option-text',
-                        frequency === 'Yearly' && 'picker-option-text-active'
-                      )}>
-                      Yearly
-                    </Text>
-                  </Pressable>
+                {/* Name */}
+                <View style={styles.field}>
+                  <Text style={styles.label}>Name</Text>
+                  <TextInput
+                      style={styles.input}
+                      placeholder="e.g. Netflix, Spotify"
+                      placeholderTextColor="rgba(0,0,0,0.4)"
+                      value={name}
+                      onChangeText={setName}
+                  />
                 </View>
-              </View>
 
-              <View className="auth-field">
-                <Text className="auth-label">Category</Text>
-
-                <View className="category-scroll">
-                  {CATEGORIES.map((cat) => (
-                    <Pressable
-                      key={cat}
-                      className={clsx('category-chip', category === cat && 'category-chip-active')}
-                      onPress={() => setCategory(cat)}>
-                      <Text
-                        className={clsx(
-                          'category-chip-text',
-                          category === cat && 'category-chip-text-active'
-                        )}>
-                        {cat}
-                      </Text>
-                    </Pressable>
-                  ))}
+                {/* Price */}
+                <View style={styles.field}>
+                  <Text style={styles.label}>Price ({currencyCode})</Text>
+                  <TextInput
+                      style={styles.input}
+                      placeholder="0.00"
+                      placeholderTextColor="rgba(0,0,0,0.4)"
+                      value={price}
+                      onChangeText={setPrice}
+                      keyboardType="decimal-pad"
+                  />
                 </View>
-              </View>
 
-              <Pressable
-                className={clsx('auth-button', !isValidForm && 'auth-button-disabled')}
-                onPress={handleSubmit}
-                disabled={!isValidForm}>
-                <Text className="auth-button-text">Create Subscription</Text>
-              </Pressable>
-            </ScrollView>
+                {/* Frequency */}
+                <View style={styles.field}>
+                  <Text style={styles.label}>Frequency</Text>
+                  <View style={styles.pickerRow}>
+                    {(['Monthly', 'Yearly'] as Frequency[]).map((f) => (
+                        <Pressable
+                            key={f}
+                            style={[styles.pickerOption, frequency === f && styles.pickerOptionActive]}
+                            onPress={() => setFrequency(f)}>
+                          <Text style={[styles.pickerText, frequency === f && styles.pickerTextActive]}>
+                            {f}
+                          </Text>
+                        </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Category */}
+                <View style={styles.field}>
+                  <Text style={styles.label}>Category</Text>
+                  <View style={styles.categoryWrap}>
+                    {CATEGORIES.map((cat) => (
+                        <Pressable
+                            key={cat}
+                            style={[styles.chip, category === cat && styles.chipActive]}
+                            onPress={() => setCategory(cat)}>
+                          <Text style={[styles.chipText, category === cat && styles.chipTextActive]}>
+                            {cat}
+                          </Text>
+                        </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Submit */}
+                <Pressable
+                    style={[styles.addButton, !isValid && styles.addButtonDisabled]}
+                    onPress={handleSubmit}
+                    disabled={!isValid}>
+                  <Text style={styles.addButtonText}>Create Subscription</Text>
+                </Pressable>
+
+              </ScrollView>
+            </Pressable>
           </Pressable>
-        </Pressable>
-      </KeyboardAvoidingView>
-    </Modal>
+        </KeyboardAvoidingView>
+      </Modal>
   );
-};
+}
 
-export default CreateSubscriptionModal;
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  container: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    maxHeight: '85%',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: 'sans-bold',
+    color: colors.primary,
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeText: {
+    fontSize: 14,
+    fontFamily: 'sans-bold',
+    color: colors.primary,
+  },
+  field: {
+    gap: 8,
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: 'sans-semibold',
+    color: colors.primary,
+  },
+  input: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    fontFamily: 'sans-medium',
+    color: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  pickerRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  pickerOption: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+  },
+  pickerOptionActive: {
+    borderColor: colors.accent,
+    backgroundColor: 'rgba(234,122,83,0.08)',
+  },
+  pickerText: {
+    fontSize: 14,
+    fontFamily: 'sans-semibold',
+    color: colors.mutedForeground,
+  },
+  pickerTextActive: {
+    color: colors.accent,
+  },
+  categoryWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: colors.card,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+  },
+  chipActive: {
+    borderColor: colors.accent,
+    backgroundColor: 'rgba(234,122,83,0.08)',
+  },
+  chipText: {
+    fontSize: 13,
+    fontFamily: 'sans-semibold',
+    color: colors.mutedForeground,
+  },
+  chipTextActive: {
+    color: colors.accent,
+  },
+  addButton: {
+    backgroundColor: colors.accent,
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+  addButtonDisabled: {
+    opacity: 0.45,
+  },
+  addButtonText: {
+    fontSize: 16,
+    fontFamily: 'sans-bold',
+    color: '#fff',
+  },
+});

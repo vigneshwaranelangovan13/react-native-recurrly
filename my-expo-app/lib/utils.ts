@@ -1,15 +1,21 @@
 import dayjs from "dayjs";
+import { useCurrencyStore } from "@/lib/currencyStore";
 
-export const formatCurrency = (value: number, currency = "USD"): string => {
+export const formatCurrency = (value: number, currency?: string): string => {
+    // ✅ pull locale + currencyCode from store at call time
+    const { currencyCode, locale } = useCurrencyStore.getState();
+    const resolvedCurrency = currency ?? currencyCode;
+    const resolvedLocale = locale;
+
     try {
-        return new Intl.NumberFormat("en-US", {
+        return new Intl.NumberFormat(resolvedLocale, {
             style: "currency",
-            currency,
+            currency: resolvedCurrency,
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }).format(value);
     } catch {
-        return value.toFixed(2);
+        return `${resolvedCurrency} ${value.toFixed(2)}`;
     }
 };
 

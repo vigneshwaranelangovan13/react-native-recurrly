@@ -1,15 +1,19 @@
 // app/(tabs)/settings.tsx
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView,
-  Pressable, TextInput, Alert, Linking,
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  TextInput,
+  Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser, useClerk } from '@clerk/expo';
 import { useRouter } from 'expo-router';
 import { colors } from '@/constants/theme';
-
-const ONBOARDED_KEY = 'hasOnboarded';
 
 export default function SettingsScreen() {
   const { user } = useUser();
@@ -25,7 +29,7 @@ export default function SettingsScreen() {
     const recipient = 'elavignesh@gmail.com';
     const subject = encodeURIComponent('Recurrly App Feedback');
     const body = encodeURIComponent(
-        `Name: ${user?.fullName ?? 'N/A'}\nEmail: ${user?.primaryEmailAddress?.emailAddress ?? 'N/A'}\n\nMessage:\n${message.trim()}`
+      `Name: ${user?.fullName ?? 'N/A'}\nEmail: ${user?.primaryEmailAddress?.emailAddress ?? 'N/A'}\n\nMessage:\n${message.trim()}`
     );
     const mailUrl = `mailto:${recipient}?subject=${subject}&body=${body}`;
     try {
@@ -42,109 +46,90 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = () => {
-    Alert.alert(
-        'Sign Out',
-        'Are you sure you want to sign out?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Sign Out',
-            style: 'destructive',
-            onPress: async () => {
-              try {
-                await signOut();
-                router.replace('/(auth)/sign-in');
-              } catch (err) {
-                console.error('[SignOut] error:', err);
-                Alert.alert('Error', 'Could not sign out. Please try again.');
-              }
-            },
-          },
-        ]
-    );
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await signOut();
+            router.replace('/(auth)/sign-in');
+          } catch (err) {
+            console.error('[SignOut] error:', err);
+            Alert.alert('Error', 'Could not sign out. Please try again.');
+          }
+        },
+      },
+    ]);
   };
 
   return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Settings</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Settings</Text>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Profile Card */}
+        <View style={styles.profileCard}>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>
+              {user?.firstName?.charAt(0)?.toUpperCase() ??
+                user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() ??
+                '?'}
+            </Text>
+          </View>
+          <View style={styles.profileInfo}>
+            <Text style={styles.userName}>{user?.fullName || user?.firstName || 'User'}</Text>
+            <Text style={styles.userEmail}>{user?.primaryEmailAddress?.emailAddress || ''}</Text>
+          </View>
         </View>
 
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}>
-
-          {/* Profile Card */}
-          <View style={styles.profileCard}>
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarText}>
-                {user?.firstName?.charAt(0)?.toUpperCase() ??
-                    user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() ?? '?'}
-              </Text>
+        {/* Feedback Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Feedback</Text>
+          <View style={styles.feedbackForm}>
+            <View style={styles.field}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                value={user?.primaryEmailAddress?.emailAddress || ''}
+                editable={false}
+                placeholderTextColor="rgba(0,0,0,0.4)"
+              />
             </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.userName}>{user?.fullName || user?.firstName || 'User'}</Text>
-              <Text style={styles.userEmail}>
-                {user?.primaryEmailAddress?.emailAddress || ''}
-              </Text>
+            <View style={styles.field}>
+              <Text style={styles.label}>Message</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Share your thoughts or report an issue..."
+                placeholderTextColor="rgba(0,0,0,0.4)"
+                multiline
+                numberOfLines={4}
+              />
             </View>
-          </View>
-
-          {/* Feedback Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Feedback</Text>
-            <View style={styles.feedbackForm}>
-              <View style={styles.field}>
-                <Text style={styles.label}>Email</Text>
-                <TextInput
-                    style={styles.input}
-                    value={user?.primaryEmailAddress?.emailAddress || ''}
-                    editable={false}
-                    placeholderTextColor="rgba(0,0,0,0.4)"
-                />
-              </View>
-              <View style={styles.field}>
-                <Text style={styles.label}>Message</Text>
-                <TextInput
-                    style={[styles.input, styles.textArea]}
-                    value={message}
-                    onChangeText={setMessage}
-                    placeholder="Share your thoughts or report an issue..."
-                    placeholderTextColor="rgba(0,0,0,0.4)"
-                    multiline
-                    numberOfLines={4}
-                />
-              </View>
-              <Pressable
-                  style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
-                  onPress={handleSendFeedback}
-                  disabled={!message.trim()}>
-                <Text style={styles.sendButtonText}>Send Feedback</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ✅ Developer Testing — remove before release */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Developer</Text>
             <Pressable
-                style={styles.row}
-                onPress={() => router.push('/onboarding')}>
-              <Text style={styles.rowText}>🧪 Test Onboarding Flow</Text>
-              <Text style={styles.chevron}>›</Text>
+              style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
+              onPress={handleSendFeedback}
+              disabled={!message.trim()}>
+              <Text style={styles.sendButtonText}>Send Feedback</Text>
             </Pressable>
           </View>
+        </View>
 
-          {/* Sign Out */}
-          <View style={styles.section}>
-            <Pressable style={styles.signOutButton} onPress={handleSignOut}>
-              <Text style={styles.signOutText}>Sign Out</Text>
-            </Pressable>
-          </View>
+        {/* Sign Out */}
+        <View style={styles.section}>
+          <Pressable style={styles.signOutButton} onPress={handleSignOut}>
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </Pressable>
+        </View>
 
-          <Text style={styles.version}>Recurrly v1.0.0</Text>
-        </ScrollView>
-      </SafeAreaView>
+        <Text style={styles.version}>Recurrly v1.0.0</Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -197,25 +182,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: 12,
     marginLeft: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.card,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  rowText: {
-    fontSize: 15,
-    fontFamily: 'sans-medium',
-    color: colors.primary,
-  },
-  chevron: {
-    fontSize: 20,
-    color: colors.mutedForeground,
   },
   feedbackForm: {
     backgroundColor: colors.card,

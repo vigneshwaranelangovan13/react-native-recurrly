@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "my-expo-app",
+    "name": "Recurrly",
     "slug": "my-expo-app",
     "version": "1.0.0",
     "scheme": "myexpoapp",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icons/logo.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash-pattern.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,10 +20,13 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.myexpoapp"
+      "bundleIdentifier": "com.vigneshwaran.recurrly",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "package": "com.yourname.myexpoapp",
+      "package": "com.vigneshwaran.recurrly",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -51,6 +54,13 @@
     ],
     "experiments": {
       "tsconfigPaths": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "29c2a187-0ad5-4784-b285-63926dd9972c"
+      }
+    },
+    "owner": "vigneshwaran13"
   }
 }

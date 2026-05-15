@@ -8,12 +8,19 @@ import { ActivityIndicator, View } from 'react-native';
 export default function Index() {
   const { isLoaded, isSignedIn } = useAuth();
   const [hasOnboarded, setHasOnboarded] = useState<boolean | null>(null);
+  const [hasAttemptedSignIn, setHasAttemptedSignIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    SecureStore.getItemAsync('hasOnboarded').then((v) => setHasOnboarded(v === 'true'));
+    Promise.all([
+      SecureStore.getItemAsync('hasOnboarded'),
+      SecureStore.getItemAsync('hasAttemptedSignIn'),
+    ]).then(([onboarded, attempted]) => {
+      setHasOnboarded(onboarded === 'true');
+      setHasAttemptedSignIn(attempted === 'true');
+    });
   }, []);
 
-  if (!isLoaded || hasOnboarded === null) {
+  if (!isLoaded || hasOnboarded === null || hasAttemptedSignIn === null) {
     return (
       <View
         style={{
@@ -29,5 +36,7 @@ export default function Index() {
 
   if (!hasOnboarded) return <Redirect href="/onboarding" />;
   if (isSignedIn) return <Redirect href="/(tabs)" />;
+  // First-time users go to sign-up, returning users go to sign-in
+  if (!hasAttemptedSignIn) return <Redirect href="/(auth)/sign-up" />;
   return <Redirect href="/(auth)/sign-in" />;
 }
